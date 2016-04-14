@@ -13,12 +13,17 @@
 
 void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 {
+  printf("Getting\n");
   uint32_t val_size;
-  uint32_t roll = rand() % (current_iteration * 2);  //gives a 1/2 chance to miss, should be adjusted
-  //char *key = itoa(roll, key_ls, 2);
+  printf("Rolling\n");
+  uint32_t roll = rand();
+  printf("Roll was %d and current_ter was %d\n",roll,current_iteration);
+  roll %= (current_iteration * 2);  //gives a 1/2 chance to miss, should be adjusted
+  printf("here\n");
   sprintf((char*)key_ls, "%d", roll);
+  printf("there\n");
   cache_get(cache, key_ls, &val_size);
-  //printf("Running sim_get.\n");
+  printf("Running sim_get.\n");
   return;
 }
 
@@ -34,9 +39,9 @@ void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 //This distribution is reflected here by the resulting actions from the roll (each possible value is worth .2%)
 void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
+  printf("Setting\n");
   uint32_t size;
   uint32_t roll = rand() % 500;
-  //char *key = itoa(key_num, key_ls, 2);    //makes the iteration number into a string, which is then used as the key
   sprintf((char*)key_ls, "%d", key_num);
   if (roll == 0)
     {
@@ -119,6 +124,7 @@ void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_
   uint32_t i;
   for(i=0; i<iterations; i++)
     {
+      printf("%u\n",i);
       uint8_t roll = rand() % 31;
       if (roll == 0) {sim_set(cache, i, val_ls, key_ls);}
       else {sim_get(cache, key_ls, i);}
@@ -138,13 +144,12 @@ int main(int argc, char** argv)
 {
   if (argc < 3)
     {
-      printf("workload_sim: <cache_size (MB)> <iterations (2^n)>\n");
+      printf("workload_sim: <server address> <cache_size (MB)> <iterations (2^n)>\n");
       return -1;
     }
-  
-  int cache_size = atoi(argv[1]);
-  int iterations = 1 << atoi(argv[2]);
-
+  server_addr = argv[1];
+  int cache_size = atoi(argv[2]);
+  int iterations = 1 << atoi(argv[3]);
   srand(iterations);
 
 
@@ -157,7 +162,6 @@ int main(int argc, char** argv)
   cache_t test_cache = create_cache(maxmem, NULL);
 
   struct timespec start,end;
-  
   clock_gettime(CLOCK_MONOTONIC, &start);
   
   simulate(test_cache, iterations, val_ls, key_ls);
@@ -165,8 +169,8 @@ int main(int argc, char** argv)
   clock_gettime(CLOCK_MONOTONIC, &end);
 
 
-  float elapsed = (end.tv_sec * BILLION + end.tv_nsec) - (start.tv_sec * BILLION + start.tv_nsec);
-  float avg = elapsed / (double)(iterations);
+  double elapsed = (end.tv_sec * BILLION + end.tv_nsec) - (start.tv_sec * BILLION + start.tv_nsec);
+  double avg = elapsed / (double)(iterations);
 
   FILE *fileout = fopen(outputFilename, "a");
   fprintf(fileout, "%f\n",avg);
