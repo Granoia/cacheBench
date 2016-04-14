@@ -13,11 +13,11 @@
 
 void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 {
-  uint32_t *val_size;
+  uint32_t val_size;
   uint32_t roll = rand() % (current_iteration * 2);  //gives a 1/2 chance to miss, should be adjusted
   //char *key = itoa(roll, key_ls, 2);
-  char *key = sprintf(key_ls, "%d", roll);
-  cache_get(cache, key, &val_size);
+  sprintf(key_ls, "%d", roll);
+  cache_get(cache, key_ls, &val_size);
   //printf("Running sim_get.\n");
   return;
 }
@@ -37,7 +37,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
   uint32_t size;
   uint32_t roll = rand() % 500;
   //char *key = itoa(key_num, key_ls, 2);    //makes the iteration number into a string, which is then used as the key
-  char *key = sprintf(key_ls, "%d", key_num);
+  sprintf(key_ls, "%d", key_num);
   if (roll == 0)
     {
       size = (rand() % ((1<<20)-1010)) + 1000;     //in this case, size is a random integer between 1000 and 2^20 - 10
