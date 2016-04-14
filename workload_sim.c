@@ -12,7 +12,7 @@
 void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 {
   uint32_t *val_size;
-  uint32_t roll = rand() % (current_iteration * 2);  //gives a 1/2 chance to miss, can be adjusted depending on what the hit/miss ratio reported in the paper is but I haven't looked it up yet
+  uint32_t roll = rand() % (current_iteration * 2);  //gives a 1/2 chance to miss, should be adjusted
   char *key = itoa(roll, key_ls, 2);
   cache_get(cache, key, &val_size);
   //printf("Running sim_get.\n");
@@ -31,11 +31,12 @@ void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 //This distribution is reflected here by the resulting actions from the roll (each possible value is worth .2%)
 void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
+  uint32_t size;
   uint32_t roll = rand() % 500;
   char *key = itoa(key_num, key_ls, 2    //makes the iteration number into a string, which is then used as the key
   if (roll == 0)
     {
-      uint32_t size = (rand() % ((1<<20)-1010)) + 1000     //in this case, size is a random integer between 1000 and 2^20 - 10
+      size = (rand() % ((1<<20)-1010)) + 1000     //in this case, size is a random integer between 1000 and 2^20 - 10
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
@@ -44,7 +45,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
     }
   else if (roll <= 25)
     {
-      uint32_t size = (rand() % 500) + 501;
+      size = (rand() % 500) + 501;
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
@@ -53,7 +54,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
     }
   else if (roll <= 225)
     {
-      uint32_t size = (rand() % 400) + 101;
+      size = (rand() % 400) + 101;
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
@@ -62,7 +63,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
     }
   else if (roll <= 260)
     {
-      uint32_t size = (rand() % 88) + 12;
+      size = (rand() % 88) + 12;
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
@@ -71,7 +72,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
     }
   else if (roll <= 275)
     {
-      uint32_t size = (rand() % 6) + 4;
+      size = (rand() % 6) + 4;
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
@@ -81,9 +82,10 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
   else
     {
       uint8_t three_sided_die = rand() % 3;
-      if (three_sided_die = 0) {uint32_t size = 2}
-      if (three_sided_die = 1) {uint32_t size = 3}
-      if (three_sided_die = 2) {uint32_t size = 11}
+      if (three_sided_die = 0) {size = 2}
+      else if (three_sided_die = 1) {size = 3}
+      else if (three_sided_die = 2) {size = 11}
+      else {printf("What happened here?\n");}
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
