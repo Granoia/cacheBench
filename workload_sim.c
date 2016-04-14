@@ -5,10 +5,21 @@
 #include <string.h>
 #include <assert.h>
 #include "cache.h"
-#include "tools.h"
+#include <pthread.h>
 #define BILLION 1000000000
 #define outputFilename "out.txt"
 
+
+
+
+struct _thread_data_obj
+{
+  uint32_t iters;
+  uint8_t *val;
+  uint8_t *key;
+};
+
+typedef struct _thread_data_obj *thread_data_t;
 
 void sim_get(cache_t cache, uint8_t *key_ls, uint32_t set_count)
 {
@@ -107,11 +118,15 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 
 
 
-
-
 //paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
-void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
+void *simulate(void *arg)
 {
+  thread_data_t data = (thread_data_t)arg;
+  cache_t cache = create_cache(0,NULL);
+  uint32_t iterations = data->iters;
+  uint8_t *val_ls = data->val;
+  uint8_t *key_ls = data->key;
+
   uint32_t i;
   uint32_t set_count = 1;
   sim_set(cache,0,val_ls,key_ls);
@@ -127,6 +142,34 @@ void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_
   return;
 }
 
+
+void parallel_clients(int num_threads, uint32_t iters, uint8_t *val, uint8_t *key)
+{
+  pthread_t threads[num_threads];
+
+  //Make the shared thread data object
+  struct _thread_data_obj data;
+  data.iters = iters;
+  data.val = val;
+  data.key = key;
+
+  //Create threads
+  int i=0;
+  for (; i < num_threads; i++)
+    {
+      pthread_create(&threads[i], NULL, simulate, &data);
+      printf("Thread %i created\n",i);
+    }
+
+  //Block until all threads complete
+  for (i = 0; i < num_threads; i++)
+    {
+      pthread_join(threads[i], NULL);
+    }
+
+  printf("Done.\n");
+  return;
+}
 
 
 
@@ -144,7 +187,7 @@ int main(int argc, char** argv)
     }
   server_addr = argv[1];
   int cache_size = atoi(argv[2]);
-  int iterations = (1 << 12) + (1 << atoi(argv[3]));
+  int iterations = (1 << atoi(argv[3]));
   srand(iterations);
 
 
@@ -154,12 +197,11 @@ int main(int argc, char** argv)
   uint8_t *key_ls = malloc(20);   //this is just a short buffer where the iteration number can be converted into a string using itoa() i mean sprintf()
 
   uint64_t maxmem = (1<<20)*cache_size;
-  cache_t test_cache = create_cache(maxmem, NULL);
-
+  cache_t cache = create_cache(maxmem, NULL);
   struct timespec start,end;
   clock_gettime(CLOCK_MONOTONIC, &start);
   
-  simulate(test_cache, iterations, val_ls, key_ls);
+  parallel_clients(1, iterations, val_ls, key_ls);
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 

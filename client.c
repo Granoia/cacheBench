@@ -90,7 +90,7 @@ char *cache_get_receive(cache_t cache)
 int cache_send(cache_t cache,const char* msg)
 {
   int msg_len = strlen(msg)+1;
-  assert(nn_send(cache->sock, msg, msg_len, 0) > 0);
+  assert(nn_send(cache->sock, msg, msg_len, 0) > 0 && "Client: Send failed");
   return 1;
 }
 
@@ -136,7 +136,7 @@ uint8_t cache_set(cache_t cache,key_type key,val_type value, uint32_t size)
   if (((uint8_t*)value)[size-1] != 0)
     {
       printf("Client: Value was not a string. Aborting.\n");
-      assert(0);
+      assert(0 && "Client: Value was not a string");
       // ((uint8_t*)value)[size-1] = 0;
     }
 
@@ -171,9 +171,8 @@ cache_t create_cache (uint64_t maxmem, hash_func hash)
   cache->buffer_size = 1<<22;
 
   cache->sock = nn_socket (AF_SP, NN_REQ);
-  assert (cache->sock >= 0);
-  printf("Client: Attempting to connect to %s...\n",server_addr);
-  assert (nn_connect (cache->sock, server_addr) >= 0);
+  assert (cache->sock >= 0 && "Client create socked failed");
+  assert (nn_connect (cache->sock, server_addr) >= 0 && "Client connect failed");
   char msg[64];
   sprintf(msg, "POST /memsize/%lu",maxmem);
   cache_send(cache,msg);
@@ -225,5 +224,3 @@ uint64_t cache_space_used(cache_t cache)
   nn_freemsg(buf);
   return ret;
 }
-
-
