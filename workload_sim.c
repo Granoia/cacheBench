@@ -35,7 +35,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
   uint32_t size;
   uint32_t roll = rand() % 500;
-  char *key = itoa(key_num, key_ls, 2    //makes the iteration number into a string, which is then used as the key
+  char *key = itoa(key_num, key_ls, 2);    //makes the iteration number into a string, which is then used as the key
   if (roll == 0)
     {
       size = (rand() % ((1<<20)-1010)) + 1000     //in this case, size is a random integer between 1000 and 2^20 - 10
@@ -84,11 +84,21 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
   else
     {
       uint8_t three_sided_die = rand() % 3;
-      if (three_sided_die = 0) {size = 2}
-      else if (three_sided_die = 1) {size = 3}
-      else if (three_sided_die = 2) {size = 11}
-      else {printf("What happened here?\n");}
-
+      switch (three_sided_die)
+	{
+	case 0:
+	  size = 2;
+	  break;
+	case 1:
+          size = 3;
+	  break;
+	case 2:
+          size = 11;
+	  break;
+        default:
+	  printf("What happened here?\n");
+	  return;
+	}
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
@@ -130,7 +140,7 @@ int main(int argc, char** argv)
       return -1;
     }
   
-  int cache_size = atoi(argv[1])
+  int cache_size = atoi(argv[1]);
   int iterations = 1 << atoi(argv[2]);
 
   srand(iterations);
@@ -156,7 +166,7 @@ int main(int argc, char** argv)
   float elapsed = (end.tv_sec * BILLION + end.tv_nsec) - (start.tv_sec * BILLION + start.tv_nsec);
   float avg = elapsed / (double)(iterations);
 
-  fileout = fopen(outputFilename, "a");
+  FILE *fileout = fopen(outputFilename, "a");
   fprintf(fileout, "%f\n",avg);
   fclose(fileout);
   printf("Average time per operation was %f\n",avg);
