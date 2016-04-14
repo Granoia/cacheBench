@@ -135,8 +135,9 @@ uint8_t cache_set(cache_t cache,key_type key,val_type value, uint32_t size)
   char msg[size + strlen(key) + 32];
   if (((uint8_t*)value)[size-1] != 0)
     {
-      printf("Value was not a string. Setting the last character of value to null.\n");
-      ((uint8_t*)value)[size-1] = 0;
+      printf("Client: Value was not a string. Aborting.\n");
+      assert(0);
+      // ((uint8_t*)value)[size-1] = 0;
     }
 
   //msg = PUT /k/v
