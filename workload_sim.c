@@ -6,7 +6,8 @@
 #include <assert.h>
 #include "cache.h"
 #include "tools.h"
-
+#define BILLION 1000000000
+#define outputFilename "out.txt"
 
 
 
