@@ -10,20 +10,12 @@
 #define outputFilename "out.txt"
 
 
-
-void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
+void sim_get(cache_t cache, uint8_t *key_ls, uint32_t set_count)
 {
-  printf("Getting\n");
   uint32_t val_size;
-  printf("Rolling\n");
-  uint32_t roll = rand();
-  printf("Roll was %d and current_ter was %d\n",roll,current_iteration);
-  roll %= (current_iteration * 2);  //gives a 1/2 chance to miss, should be adjusted
-  printf("here\n");
+  uint32_t roll = rand() % (set_count * 2);  //gives a 1/2 chance to miss, should be adjusted
   sprintf((char*)key_ls, "%d", roll);
-  printf("there\n");
   cache_get(cache, key_ls, &val_size);
-  printf("Running sim_get.\n");
   return;
 }
 
@@ -39,7 +31,6 @@ void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 //This distribution is reflected here by the resulting actions from the roll (each possible value is worth .2%)
 void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
-  printf("Setting\n");
   uint32_t size;
   uint32_t roll = rand() % 500;
   sprintf((char*)key_ls, "%d", key_num);
@@ -47,45 +38,45 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
     {
       size = (rand() % ((1<<20)-1010)) + 1000;     //in this case, size is a random integer between 1000 and 2^20 - 10
       val_ls[size] = 0;
-      cache_set(cache, key_ls, val_ls, size);
+      cache_set(cache, key_ls, val_ls, size+1);
       val_ls[size] = 41;
-      //printf("sim_set rolled 0. Set a value of size %i.\n",size);
+      //      printf("sim_set rolled 0. Set a value of size %i.\n",size);
       return;
     }
   else if (roll <= 25)
     {
       size = (rand() % 500) + 501;
       val_ls[size] = 0;
-      cache_set(cache, key_ls, val_ls, size);
+      cache_set(cache, key_ls, val_ls, size+1);
       val_ls[size] = 41;
-      //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
+      // printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
   else if (roll <= 225)
     {
       size = (rand() % 400) + 101;
       val_ls[size] = 0;
-      cache_set(cache, key_ls, val_ls, size);
+      cache_set(cache, key_ls, val_ls, size+1);
       val_ls[size] = 41;
-      //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
+      //   printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
   else if (roll <= 260)
     {
       size = (rand() % 88) + 12;
       val_ls[size] = 0;
-      cache_set(cache, key_ls, val_ls, size);
+      cache_set(cache, key_ls, val_ls, size+1);
       val_ls[size] = 41;
-      //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
+      //  printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
   else if (roll <= 275)
     {
       size = (rand() % 6) + 4;
       val_ls[size] = 0;
-      cache_set(cache, key_ls, val_ls, size);
+      cache_set(cache, key_ls, val_ls, size+1);
       val_ls[size] = 41;
-      //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
+      //  printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
   else
@@ -107,9 +98,9 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 	  return;
 	}
       val_ls[size] = 0;
-      cache_set(cache, key_ls, val_ls, size);
+      cache_set(cache, key_ls, val_ls, size+1);
       val_ls[size] = 41;
-      //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
+      //   printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
 }	    
@@ -122,12 +113,16 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
 {
   uint32_t i;
-  for(i=0; i<iterations; i++)
+  uint32_t set_count = 1;
+  sim_set(cache,0,val_ls,key_ls);
+  for(i=1; i<iterations; i++)
     {
-      printf("%u\n",i);
       uint8_t roll = rand() % 31;
-      if (roll == 0) {sim_set(cache, i, val_ls, key_ls);}
-      else {sim_get(cache, key_ls, i);}
+      if (!roll) {
+	set_count++;
+	sim_set(cache, set_count, val_ls, key_ls);
+      }
+      else {sim_get(cache, key_ls, set_count);}
     }
   return;
 }
@@ -149,7 +144,7 @@ int main(int argc, char** argv)
     }
   server_addr = argv[1];
   int cache_size = atoi(argv[2]);
-  int iterations = 1 << atoi(argv[3]);
+  int iterations = (1 << 12) + (1 << atoi(argv[3]));
   srand(iterations);
 
 
