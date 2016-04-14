@@ -17,8 +17,8 @@ void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_
   for(i; i<iterations; i++)
     {
       uint8_t roll = rand() % 31;
-      if (roll == 0) {sim_set(cache, i, val_ls, key_ls)}
-      else {sim_get(cache, key_ls, i)}
+      if (roll == 0) {sim_set(cache, i, val_ls, key_ls);}
+      else {sim_get(cache, key_ls, i);}
     }
   return;
 }
