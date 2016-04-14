@@ -3,8 +3,8 @@
 #include <time.h>
 #include <string.h>
 #include <assert.h>
-#include "../cache.h"
-#include "../tools.h"
+#include "cache.h"
+#include "tools.h"
 
 
 
@@ -48,7 +48,7 @@ void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
   uint32_t roll = rand() % 500;
-  char *key = itoa(key_num, key_ls, 2)                     //this makes the iteration number into a string, which is then used as the key for the set value
+  char *key = itoa(key_num, key_ls, 2    //makes the iteration number into a string, which is then used as the key
   if (roll == 0)
     {
       uint32_t size = (rand() % ((1<<20)-1010)) + 1000     //in this case, size is a random integer between 1000 and 2^20 - 10
@@ -58,7 +58,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
       //printf("sim_set rolled 0. Set a value of size %i.\n",size);
       return;
     }
-  if ((roll >= 1) && (roll <= 25))
+  else if (roll <= 25)
     {
       uint32_t size = (rand() % 500) + 501;
       val_ls[size] = 0;
@@ -67,7 +67,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
       //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
-  if ((roll >= 26) && (roll <= 225))
+  else if (roll <= 225)
     {
       uint32_t size = (rand() % 400) + 101;
       val_ls[size] = 0;
@@ -76,7 +76,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
       //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
-  if ((roll >= 226) && (roll <= 260))
+  else if (roll <= 260)
     {
       uint32_t size = (rand() % 88) + 12;
       val_ls[size] = 0;
@@ -85,7 +85,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
       //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
-  if ((roll >= 261) && (roll <= 275))
+  else if (roll <= 275)
     {
       uint32_t size = (rand() % 6) + 4;
       val_ls[size] = 0;
@@ -106,9 +106,7 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
       //printf("sim_set rolled %i. Set a value of size %i.\n",roll,size);
       return;
     }
-}
-	    
-
+}	    
 
 
 
