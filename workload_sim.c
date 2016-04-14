@@ -9,22 +9,6 @@
 
 
 
-
-//paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
-void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
-{
-  uint32_t i = 0;
-  for(i; i<iterations; i++)
-    {
-      uint8_t roll = rand() % 31;
-      if (roll == 0) {sim_set(cache, i, val_ls, key_ls);}
-      else {sim_get(cache, key_ls, i);}
-    }
-  return;
-}
-
-
-
 void sim_get(cache_t cache, uint8_t *key_ls, uint32_t current_iteration)
 {
   uint32_t *val_size;
@@ -107,6 +91,23 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
       return;
     }
 }	    
+
+
+
+
+
+//paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
+void simulate(cache_t cache, uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
+{
+  uint32_t i = 0;
+  for(i; i<iterations; i++)
+    {
+      uint8_t roll = rand() % 31;
+      if (roll == 0) {sim_set(cache, i, val_ls, key_ls);}
+      else {sim_get(cache, key_ls, i);}
+    }
+  return;
+}
 
 
 
