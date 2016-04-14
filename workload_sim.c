@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
@@ -81,9 +82,9 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
   else
     {
       uint8_t three_sided_die = rand() % 3;
-      if (three_sided_die = 0) {uint32_t size = 2}
-      if (three_sided_die = 1) {uint32_t size = 3}
-      if (three_sided_die = 2) {uint32_t size = 11}
+      if (three_sided_die = 0) {uint32_t size = 2;}
+      if (three_sided_die = 1) {uint32_t size = 3;}
+      if (three_sided_die = 2) {uint32_t size = 11;}
       val_ls[size] = 0;
       cache_set(cache, key_ls, val_ls, size);
       val_ls[size] = 41;
