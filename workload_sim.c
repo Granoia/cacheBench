@@ -175,6 +175,6 @@ int main(int argc, char** argv)
   FILE *fileout = fopen(outputFilename, "a");
   fprintf(fileout, "%f\n",avg);
   fclose(fileout);
-  printf("Average time per operation was %f\n",avg);
+  printf("Average time per operation was %f. Total elapsed time was %f.\n",avg, elapsed);
   return 0;
 }
