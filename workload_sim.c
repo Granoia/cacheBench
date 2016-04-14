@@ -12,7 +12,6 @@
 
 void sim_get(cache_t cache, uint8_t *key_ls, uint32_t set_count)
 {
-  printf("get\n");
   uint32_t val_size;
   uint32_t roll = rand() % (set_count * 2);  //gives a 1/2 chance to miss, should be adjusted
   sprintf((char*)key_ls, "%d", roll);
@@ -32,7 +31,6 @@ void sim_get(cache_t cache, uint8_t *key_ls, uint32_t set_count)
 //This distribution is reflected here by the resulting actions from the roll (each possible value is worth .2%)
 void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
-  printf("set\n");
   uint32_t size;
   uint32_t roll = rand() % 500;
   sprintf((char*)key_ls, "%d", key_num);
