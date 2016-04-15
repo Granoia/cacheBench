@@ -13,15 +13,6 @@ uint32_t set_count;
 uint32_t recv_count;
 uint64_t avg_wait_time;
 
-struct _thread_data_obj
-{
-  uint64_t iters;
-  uint8_t *val;
-  uint8_t *key;
-  uint64_t port;
-};
-
-typedef struct _thread_data_obj *thread_data_t;
 
 void sim_get(cache_t cache, uint8_t *key_ls, uint64_t set_count)
 {
@@ -118,30 +109,6 @@ void sim_set(cache_t cache, uint64_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 }	    
 
 
-/*
-//paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
-void simulate(uint64_t iterations, uint8_t *val_ls, uint8_t *key_ls)
-{ 
-  uint64_t i;
-  uint64_t set_count = 1;
-  uint8_t roll;
- 
- 
-  sim_set(cache,0,val_ls,key_ls);
-  for(i=1; i<iterations; i++)
-    {
-      roll = rand() % 31;
-      if (!roll) {
-	set_count++;
-	sim_set(cache, set_count, val_ls, key_ls);
-      }
-      else {sim_get(cache, key_ls, set_count);}
-    }
-  return;
-}
-*/
-
-
 //Rolls a die and sends a Get or Set request to the cache
 uint64_t send_request(cache_t cache, uint8_t *val_ls, uint8_t *key_ls)
 {
@@ -161,6 +128,7 @@ uint64_t send_request(cache_t cache, uint8_t *val_ls, uint8_t *key_ls)
 
 int main(int argc, char** argv)
 {
+  printf("Workload Simulation:\n\n");
   if (argc < 3)
     {
       printf("workload_sim: <server address> <avg_wait_time(us)>\n");
@@ -172,13 +140,15 @@ int main(int argc, char** argv)
   srand(avg_wait_time);
 
   
-
+  printf("Initializing data.\n");
   //data initialization  
   uint8_t *val_ls = malloc(1<<20);
   memset(val_ls, 41, 1<<20);
   uint8_t *key_ls = malloc(20);   //this is just a short buffer where the iteration number can be converted into a string using itoa() i mean sprintf()
+  printf("cache\n");
   cache_t test_cache = create_cache(1<<26,NULL);
-  uint64_t send_count = 0;
+  printf("cache2\n");  
+uint64_t send_count = 0;
   uint64_t recv_count = 0;
 
   //Initialize the delay timer (between sends)
@@ -191,11 +161,13 @@ int main(int argc, char** argv)
   clock_gettime(CLOCK_MONOTONIC, &start);
   clock_gettime(CLOCK_MONOTONIC, &end);
 
-
+  printf("Entering main loop.\n");
   //Main loop - send and receive for 30 seconds
   sim_set(test_cache,0,val_ls,key_ls);
+  printf("did preliminary set\n");
   while (end.tv_sec - start.tv_sec <= 30)
     {
+      printf("\rTime left: %d",(int)end.tv_sec - (int)start.tv_sec);
       //Send
       send_request(test_cache, val_ls, key_ls);
       nanosleep(&sleep_timer,NULL);

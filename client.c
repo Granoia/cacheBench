@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <time.h>
 #include "nanomsg/src/nn.h"
-#include "nanomsg/src/reqrep.h"
+#include "nanomsg/src/pair.h"
 #include "cache.h"
 #include <stdio.h>
 #include <unistd.h>
