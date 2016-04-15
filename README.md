@@ -16,7 +16,7 @@ Due to the limitations of the slab allocator, we consider it correct behavior if
 
 <b>DELETE /k</v> - Deletes the value and returns a success message.
 
-<b>PUT /memsize/v>b> - If no cache exists, initiates a new cache with the given max memory.
+<b>PUT /memsize/v </b> - If no cache exists, initiates a new cache with the given max memory.
 
 <h1>Metric</h1>
 <b>Sustained throughput (rqsts/sec):</b> Maximum load at which mean response time remains under 1 ms
@@ -38,7 +38,7 @@ We used the following distribution for size of set values:
 .2%   1000bytes-1MB
 
 
-<11>Experiment</h1>
+</h1>Experiment</h1>
 
 <h1>Analysis</h1>
 
