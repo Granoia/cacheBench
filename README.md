@@ -2,6 +2,7 @@
 
 The jsmn library can be installed with git clone https://github.com/zserge/jsmn and the included makefile.
 
+We had to change our implementation to run the tests. We have been using the "REQREP" socket protocol, but it doesn't allow a socket to receive twice in a row (which wouldn't be a request-reply protocol). Since we want to send a bunch of requests and then receive a bunch of replies, we changed the protocol to PAIR. We don't know how much this effects our numbers.
 
 <h1> System Definition</h1>
 The goal of the cache is to set and return key,value pairs of a network.
