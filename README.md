@@ -1,7 +1,6 @@
 # cacheBench
-benchmarking our cache
 
-DONT FORGET TO TALK ABOUT THE JSMN THING WE HAD TO DO GIT CLONE AND THEN HAD TO MAKE IN THE JSMN FOLDER
+The jsmn library can be installed with git clone https://github.com/zserge/jsmn and the included makefile.
 
 
 <h1> System Definition</h1>
@@ -30,6 +29,14 @@ Due to the limitations of the slab allocator, we consider it correct behavior if
 
 <h1>Workload</h1>
 The Memcache ETC workload
+We used the following distribution for size of set values:
+40%   2, 3, and 11 bytes
+3%    3-10 bytes
+7%    12-100 bytes
+45%   100-500 bytes
+4.8%  500-1000 bytes
+.2%   1000bytes-1MB
+
 
 <11>Experiment</h1>
 
