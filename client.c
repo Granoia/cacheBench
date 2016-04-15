@@ -80,7 +80,7 @@ cache_t create_cache (uint64_t maxmem, hash_func hash)
 {
   cache_t cache = malloc(sizeof(struct cache_obj));
 
-  cache->sock = nn_socket (AF_SP, NN_REQ); 
+  cache->sock = nn_socket (AF_SP, NN_PAIR); 
   assert (cache->sock >= 0 && "Client create socked failed");
   assert (nn_connect (cache->sock, server_addr) >= 0 && "Client connect failed");
 
