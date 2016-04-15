@@ -28,7 +28,8 @@ Due to the limitations of the slab allocator, we consider it correct behavior if
 <h1>Evaluation Technique</h1>
 
 <h1>Workload</h1>
-The Memcache ETC workload
+The Memcache ETC workload:
+
 We used the following distribution for size of set values:
 40%   2, 3, and 11 bytes
 3%    3-10 bytes
