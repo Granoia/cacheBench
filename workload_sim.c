@@ -17,6 +17,7 @@ struct _thread_data_obj
   uint32_t iters;
   uint8_t *val;
   uint8_t *key;
+  uint32_t port;
 };
 
 typedef struct _thread_data_obj *thread_data_t;
@@ -30,7 +31,7 @@ void sim_get(cache_t cache, uint8_t *key_ls, uint32_t set_count)
   return;
 }
 
-
+uint32_t avg_wait_time;
 
 //ETC workload consists of the following distribution for size of set values:
 //40%   2, 3, and 11 bytes
@@ -119,20 +120,17 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 
 
 //paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
-void *simulate(void *arg)
-{
-  thread_data_t data = (thread_data_t)arg;
-  cache_t cache = create_cache(0,NULL);
-  uint32_t iterations = data->iters;
-  uint8_t *val_ls = data->val;
-  uint8_t *key_ls = data->key;
-
+void simulate(uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
+{ 
   uint32_t i;
   uint32_t set_count = 1;
+  uint8_t roll;
+  cache_t cache = create_cache(1<<26,NULL);
+ 
   sim_set(cache,0,val_ls,key_ls);
   for(i=1; i<iterations; i++)
     {
-      uint8_t roll = rand() % 31;
+      roll = rand() % 31;
       if (!roll) {
 	set_count++;
 	sim_set(cache, set_count, val_ls, key_ls);
@@ -141,36 +139,6 @@ void *simulate(void *arg)
     }
   return;
 }
-
-
-void parallel_clients(int num_threads, uint32_t iters, uint8_t *val, uint8_t *key)
-{
-  pthread_t threads[num_threads];
-
-  //Make the shared thread data object
-  struct _thread_data_obj data;
-  data.iters = iters;
-  data.val = val;
-  data.key = key;
-
-  //Create threads
-  int i=0;
-  for (; i < num_threads; i++)
-    {
-      pthread_create(&threads[i], NULL, simulate, &data);
-      printf("Thread %i created\n",i);
-    }
-
-  //Block until all threads complete
-  for (i = 0; i < num_threads; i++)
-    {
-      pthread_join(threads[i], NULL);
-    }
-
-  printf("Done.\n");
-  return;
-}
-
 
 
 
@@ -182,13 +150,15 @@ int main(int argc, char** argv)
 {
   if (argc < 3)
     {
-      printf("workload_sim: <server address> <cache_size (MB)> <iterations (2^n)>\n");
+      printf("workload_sim: <server address> <avg_wait_time(us)>\n");
       return -1;
     }
   server_addr = argv[1];
-  int cache_size = atoi(argv[2]);
-  int iterations = (1 << atoi(argv[3]));
+  int cache_size = 100;
+  int iterations = 1 << 13;
   srand(iterations);
+
+  avg_wait_time = atoi(argv[2]);
 
 
   //data initialization  
@@ -196,12 +166,10 @@ int main(int argc, char** argv)
   memset(val_ls, 41, 1<<20);
   uint8_t *key_ls = malloc(20);   //this is just a short buffer where the iteration number can be converted into a string using itoa() i mean sprintf()
 
-  uint64_t maxmem = (1<<20)*cache_size;
-  cache_t cache = create_cache(maxmem, NULL);
   struct timespec start,end;
   clock_gettime(CLOCK_MONOTONIC, &start);
   
-  parallel_clients(1, iterations, val_ls, key_ls);
+  simulate(iterations, val_ls, key_ls);
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 
