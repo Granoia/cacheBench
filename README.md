@@ -12,9 +12,9 @@ Due to the limitations of the slab allocator, we consider it correct behavior if
 <h1> Services and Outcomes</h1>
 <b>GET /k </b> - Returns the correct value or nil. Returns an error message if the value is too large.
 
-<b>SET /k /v </b> - Sets the value and returns a success message.
+<b>SET /k/v </b> - Sets the value and returns a success message.
 
-<b>DELETE /k</v </b> - Deletes the value and returns a success message.
+<b>DELETE /k/v </b> - Deletes the value and returns a success message.
 
 <b>PUT /memsize/v </b> - If no cache exists, initiates a new cache with the given max memory.
 
