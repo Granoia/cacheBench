@@ -21,9 +21,10 @@ struct cache_obj
 
 
 //Receives from the server
+//Nonblocking; returns 0 if nothing was received
 int cache_recv(cache_t cache)
 {
-  int result = nn_recv (cache->sock, &cache->buffer, buffer_size, 0);
+  int result = nn_recv (cache->sock, cache->buffer, buffer_size, NN_DONTWAIT);
   if (result < 1) {
     return 0;
   }
@@ -42,7 +43,7 @@ int cache_send(cache_t cache,const char* msg)
 val_type cache_get(cache_t cache, key_type key, uint32_t *size)
 {
   sprintf(cache->buffer, "GET /%s",key);
-  cache_send(cache, msg);
+  cache_send(cache, cache->buffer);
   return NULL;
 }
 
@@ -59,7 +60,7 @@ uint8_t cache_set(cache_t cache,key_type key,val_type value, uint32_t size)
   sprintf(cache->buffer, "PUT /%s/%s",(char*) key,(char*) value);
 
   //Send the message
-  cache_send(cache, msg);
+  cache_send(cache, cache->buffer);
   return 0;
 }
 
@@ -74,9 +75,8 @@ cache_t create_cache (uint64_t maxmem, hash_func hash)
   assert (nn_connect (cache->sock, server_addr) >= 0 && "Client connect failed");
 
   if (maxmem > 0) {
-  char msg[64];
-  sprintf(msg, "POST /memsize/%lu",maxmem);
-  cache_send(cache,msg);
+  sprintf(cache->buffer, "POST /memsize/%lu",maxmem);
+  cache_send(cache,cache->buffer);
   cache_recv(cache);
   }
   return cache;
