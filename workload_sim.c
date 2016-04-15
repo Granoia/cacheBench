@@ -11,6 +11,7 @@
 
 uint32_t set_count;
 uint32_t recv_count;
+uint64_t avg_wait_time;
 
 struct _thread_data_obj
 {
@@ -24,14 +25,13 @@ typedef struct _thread_data_obj *thread_data_t;
 
 void sim_get(cache_t cache, uint8_t *key_ls, uint64_t set_count)
 {
-  uint64_t val_size;
+  uint32_t val_size;
   uint64_t roll = rand() % (set_count * 2);  //gives a 1/2 chance to miss, should be adjusted
-  sprintf((char*)key_ls, "%d", roll);
+  sprintf((char*)key_ls, "%lu", roll);
   cache_get(cache, key_ls, &val_size);
   return;
 }
 
-uint64_t avg_wait_time;
 
 //ETC workload consists of the following distribution for size of set values:
 //40%   2, 3, and 11 bytes
@@ -45,7 +45,7 @@ void sim_set(cache_t cache, uint64_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
   uint64_t size;
   uint64_t roll = rand() % 500;
-  sprintf((char*)key_ls, "%d", key_num);
+  sprintf((char*)key_ls, "%lu", key_num);
   if (roll == 0)
     {
       size = (rand() % ((1<<20)-1010)) + 1000;     //in this case, size is a random integer between 1000 and 2^20 - 10
@@ -118,7 +118,7 @@ void sim_set(cache_t cache, uint64_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 }	    
 
 
-
+/*
 //paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
 void simulate(uint64_t iterations, uint8_t *val_ls, uint8_t *key_ls)
 { 
@@ -139,7 +139,7 @@ void simulate(uint64_t iterations, uint8_t *val_ls, uint8_t *key_ls)
     }
   return;
 }
-
+*/
 
 
 
@@ -148,16 +148,12 @@ uint64_t send_request(cache_t cache, uint64_t counter, uint8_t *val_ls, uint8_t 
   uint64_t set_count = counter;
   uint8_t roll;
  
-
-  for(i=1; i<iterations; i++)
-    {
-      roll = rand() % 31;
+     roll = rand() % 31;
       if (!roll) {
 	set_count++;
 	sim_set(cache, set_count, val_ls, key_ls);
       }
       else {sim_get(cache, key_ls, set_count);}
-    }
   return set_count;
 }
   
@@ -179,9 +175,10 @@ int main(int argc, char** argv)
       return -1;
     }
   server_addr = argv[1];
-  srand(iterations);
-
   avg_wait_time = atoi(argv[2]);
+  
+  srand(avg_wait_time);
+
   
 
   //data initialization  
@@ -214,18 +211,10 @@ int main(int argc, char** argv)
       while (cache_recv(test_cache)) recv_count ++;
       clock_gettime(CLOCK_MONOTONIC, &end);
     }
-      
-
-
-  clock_gettime(CLOCK_MONOTONIC, &end);
-
-
-  double elapsed = (end.tv_sec * BILLION + end.tv_nsec) - (start.tv_sec * BILLION + start.tv_nsec);
-  double avg = elapsed / (double)(iterations);
 
   FILE *fileout = fopen(outputFilename, "a");
-  fprintf(fileout, "%f\n",avg);
+  fprintf(fileout, "%lu, %lu\n",avg_wait_time,send_count - recv_count);
   fclose(fileout);
-  printf("Average time per operation was %f. Total elapsed time was %f.\n",avg, elapsed);
+  printf("Send: %lu    Recv: %lu    Discrepancy was %lu.\n",send_count,recv_count,send_count - recv_count);
   return 0;
 }
