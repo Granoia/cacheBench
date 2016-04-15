@@ -14,24 +14,24 @@ uint32_t recv_count;
 
 struct _thread_data_obj
 {
-  uint32_t iters;
+  uint64_t iters;
   uint8_t *val;
   uint8_t *key;
-  uint32_t port;
+  uint64_t port;
 };
 
 typedef struct _thread_data_obj *thread_data_t;
 
-void sim_get(cache_t cache, uint8_t *key_ls)
+void sim_get(cache_t cache, uint8_t *key_ls, uint64_t set_count)
 {
-  uint32_t val_size;
-  uint32_t roll = rand() % (set_count * 2);  //gives a 1/2 chance to miss, should be adjusted
+  uint64_t val_size;
+  uint64_t roll = rand() % (set_count * 2);  //gives a 1/2 chance to miss, should be adjusted
   sprintf((char*)key_ls, "%d", roll);
   cache_get(cache, key_ls, &val_size);
   return;
 }
 
-uint32_t avg_wait_time;
+uint64_t avg_wait_time;
 
 //ETC workload consists of the following distribution for size of set values:
 //40%   2, 3, and 11 bytes
@@ -41,10 +41,10 @@ uint32_t avg_wait_time;
 //4.8%  500-1000 bytes
 //.2%   1000bytes-1MB
 //This distribution is reflected here by the resulting actions from the roll (each possible value is worth .2%)
-void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
+void sim_set(cache_t cache, uint64_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 {
-  uint32_t size;
-  uint32_t roll = rand() % 500;
+  uint64_t size;
+  uint64_t roll = rand() % 500;
   sprintf((char*)key_ls, "%d", key_num);
   if (roll == 0)
     {
@@ -120,12 +120,12 @@ void sim_set(cache_t cache, uint32_t key_num, uint8_t *val_ls, uint8_t *key_ls)
 
 
 //paper observes a 30:1 get:set ratio in the ETC workload, which is reflected here by the resulting actions from the roll
-void simulate(uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
+void simulate(uint64_t iterations, uint8_t *val_ls, uint8_t *key_ls)
 { 
-  uint32_t i;
-  uint32_t set_count = 1;
+  uint64_t i;
+  uint64_t set_count = 1;
   uint8_t roll;
-  cache_t cache = create_cache(1<<26,NULL);
+ 
  
   sim_set(cache,0,val_ls,key_ls);
   for(i=1; i<iterations; i++)
@@ -139,6 +139,31 @@ void simulate(uint32_t iterations, uint8_t *val_ls, uint8_t *key_ls)
     }
   return;
 }
+
+
+
+
+uint64_t send_request(cache_t cache, uint64_t counter, uint8_t *val_ls, uint8_t *key_ls)
+{
+  uint64_t set_count = counter;
+  uint8_t roll;
+ 
+
+  for(i=1; i<iterations; i++)
+    {
+      roll = rand() % 31;
+      if (!roll) {
+	set_count++;
+	sim_set(cache, set_count, val_ls, key_ls);
+      }
+      else {sim_get(cache, key_ls, set_count);}
+    }
+  return set_count;
+}
+  
+
+
+
 
 
 
@@ -157,17 +182,40 @@ int main(int argc, char** argv)
   srand(iterations);
 
   avg_wait_time = atoi(argv[2]);
-
+  
 
   //data initialization  
   uint8_t *val_ls = malloc(1<<20);
   memset(val_ls, 41, 1<<20);
   uint8_t *key_ls = malloc(20);   //this is just a short buffer where the iteration number can be converted into a string using itoa() i mean sprintf()
 
+  cache_t test_cache = create_cache(1<<26,NULL);
+
+  uint64_t set_counter = 1;
+  uint64_t send_count = 0;
+  uint64_t recv_count = 0;
+
+
+  struct timespec sleep_timer;
+  sleep_timer.tv_sec = 0;
+  sleep_timer.tv_nsec = rand() % (2*avg_wait_time);
+
+
   struct timespec start,end;
   clock_gettime(CLOCK_MONOTONIC, &start);
-  
-  simulate(iterations, val_ls, key_ls);
+  clock_gettime(CLOCK_MONOTONIC, &end);
+  sim_set(test_cache,0,val_ls,key_ls);
+  while (end.tv_sec <= 30)
+    {
+      set_counter = send_request(test_cache, set_counter, val_ls, key_ls);
+      nanosleep(&sleep_timer,NULL);
+      sleep_timer.tv_nsec = rand() % (2*avg_wait_time);
+      send_count ++;
+      while (cache_recv(test_cache)) recv_count ++;
+      clock_gettime(CLOCK_MONOTONIC, &end);
+    }
+      
+
 
   clock_gettime(CLOCK_MONOTONIC, &end);
 
