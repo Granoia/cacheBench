@@ -142,10 +142,10 @@ void simulate(uint64_t iterations, uint8_t *val_ls, uint8_t *key_ls)
 */
 
 
-
-uint64_t send_request(cache_t cache, uint64_t counter, uint8_t *val_ls, uint8_t *key_ls)
+//Rolls a die and sends a Get or Set request to the cache
+uint64_t send_request(cache_t cache, uint8_t *val_ls, uint8_t *key_ls)
 {
-  uint64_t set_count = counter;
+  static uint64_t set_count = 1;
   uint8_t roll;
  
      roll = rand() % 31;
@@ -154,17 +154,9 @@ uint64_t send_request(cache_t cache, uint64_t counter, uint8_t *val_ls, uint8_t 
 	sim_set(cache, set_count, val_ls, key_ls);
       }
       else {sim_get(cache, key_ls, set_count);}
-  return set_count;
 }
   
 
-
-
-
-
-
-//main will need to preallocate a key list and a value list as an initialization step so that this is not factored into the timer for the cache
-//value list should be 1MB long, and thus cache_sets can quickly change the desired character to the null terminator and submit the appropriate size parameter
 
 
 int main(int argc, char** argv)
@@ -185,29 +177,32 @@ int main(int argc, char** argv)
   uint8_t *val_ls = malloc(1<<20);
   memset(val_ls, 41, 1<<20);
   uint8_t *key_ls = malloc(20);   //this is just a short buffer where the iteration number can be converted into a string using itoa() i mean sprintf()
-
   cache_t test_cache = create_cache(1<<26,NULL);
-
-  uint64_t set_counter = 1;
   uint64_t send_count = 0;
   uint64_t recv_count = 0;
 
-
+  //Initialize the delay timer (between sends)
   struct timespec sleep_timer;
   sleep_timer.tv_sec = 0;
   sleep_timer.tv_nsec = rand() % (2*avg_wait_time);
 
-
+  //Initialize the 30-second timer
   struct timespec start,end;
   clock_gettime(CLOCK_MONOTONIC, &start);
   clock_gettime(CLOCK_MONOTONIC, &end);
+
+
+  //Main loop - send and receive for 30 seconds
   sim_set(test_cache,0,val_ls,key_ls);
   while (end.tv_sec - start.tv_sec <= 30)
     {
-      set_counter = send_request(test_cache, set_counter, val_ls, key_ls);
+      //Send
+      send_request(test_cache, val_ls, key_ls);
       nanosleep(&sleep_timer,NULL);
       sleep_timer.tv_nsec = rand() % (2*avg_wait_time);
       send_count ++;
+
+      //Receive everything in the buffer
       while (cache_recv(test_cache)) recv_count ++;
       clock_gettime(CLOCK_MONOTONIC, &end);
     }
@@ -215,6 +210,9 @@ int main(int argc, char** argv)
   FILE *fileout = fopen(outputFilename, "a");
   fprintf(fileout, "%lu, %lu\n",avg_wait_time,send_count - recv_count);
   fclose(fileout);
-  printf("Send: %lu    Recv: %lu    Discrepancy was %f.\n",send_count,recv_count,(double)recv_count / send_count);
+  printf("Sends: %lu    Recvs: %lu    Discrepancy was %f.\n",send_count,recv_count,(double)recv_count / send_count);
+  sleep(5);
+  while (cache_recv(test_cache)) recv_count++;
+  printf("Final recvs: %lu\n", recv_count);
   return 0;
 }

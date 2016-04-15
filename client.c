@@ -25,9 +25,19 @@ struct cache_obj
 int cache_recv(cache_t cache)
 {
   int result = nn_recv (cache->sock, cache->buffer, buffer_size, NN_DONTWAIT);
-  if (result < 1) {
-    return 0;
-  }
+  if (result < 0 && errno == EAGAIN) return 0;
+  if (result < 0)
+    {
+      switch (errno)
+	{
+	case EBADF: printf("EBADF\n"); return 0;
+	case ENOTSUP: printf("ENOTSUP\n"); return 0;
+	case EFSM: printf("EFSM\n"); return 0;
+	case EINTR: printf("EINTR\n"); return 0;
+	case ETIMEDOUT: printf("ETIMEDOUT\n"); return 0;
+	case ETERM: printf("ETERM\n"); return 0;
+	}
+    }
   return 1;
 }
 
@@ -77,7 +87,6 @@ cache_t create_cache (uint64_t maxmem, hash_func hash)
   if (maxmem > 0) {
   sprintf(cache->buffer, "POST /memsize/%lu",maxmem);
   cache_send(cache,cache->buffer);
-  cache_recv(cache);
   }
   return cache;
 }
