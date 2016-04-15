@@ -5,12 +5,12 @@
 #include <string.h>
 #include <assert.h>
 #include "cache.h"
-#include <pthread.h>
 #define BILLION 1000000000
 #define outputFilename "out.txt"
 
 
-
+uint32_t set_count;
+uint32_t recv_count;
 
 struct _thread_data_obj
 {
@@ -22,7 +22,7 @@ struct _thread_data_obj
 
 typedef struct _thread_data_obj *thread_data_t;
 
-void sim_get(cache_t cache, uint8_t *key_ls, uint32_t set_count)
+void sim_get(cache_t cache, uint8_t *key_ls)
 {
   uint32_t val_size;
   uint32_t roll = rand() % (set_count * 2);  //gives a 1/2 chance to miss, should be adjusted
@@ -154,8 +154,6 @@ int main(int argc, char** argv)
       return -1;
     }
   server_addr = argv[1];
-  int cache_size = 100;
-  int iterations = 1 << 13;
   srand(iterations);
 
   avg_wait_time = atoi(argv[2]);
