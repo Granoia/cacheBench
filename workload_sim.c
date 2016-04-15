@@ -175,7 +175,7 @@ int main(int argc, char** argv)
       return -1;
     }
   server_addr = argv[1];
-  avg_wait_time = atoi(argv[2]);
+  avg_wait_time = atoi(argv[2]) * 1000;
   
   srand(avg_wait_time);
 
@@ -202,7 +202,7 @@ int main(int argc, char** argv)
   clock_gettime(CLOCK_MONOTONIC, &start);
   clock_gettime(CLOCK_MONOTONIC, &end);
   sim_set(test_cache,0,val_ls,key_ls);
-  while (end.tv_sec <= 30)
+  while (end.tv_sec - start.tv_sec <= 30)
     {
       set_counter = send_request(test_cache, set_counter, val_ls, key_ls);
       nanosleep(&sleep_timer,NULL);
@@ -215,6 +215,6 @@ int main(int argc, char** argv)
   FILE *fileout = fopen(outputFilename, "a");
   fprintf(fileout, "%lu, %lu\n",avg_wait_time,send_count - recv_count);
   fclose(fileout);
-  printf("Send: %lu    Recv: %lu    Discrepancy was %lu.\n",send_count,recv_count,send_count - recv_count);
+  printf("Send: %lu    Recv: %lu    Discrepancy was %f.\n",send_count,recv_count,(double)recv_count / send_count);
   return 0;
 }
