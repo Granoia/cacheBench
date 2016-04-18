@@ -167,7 +167,6 @@ uint64_t send_count = 0;
   printf("did preliminary set\n");
   while (end.tv_sec - start.tv_sec <= 30)
     {
-      printf("\rTime left: %d",(int)end.tv_sec - (int)start.tv_sec);
       //Send
       send_request(test_cache, val_ls, key_ls);
       nanosleep(&sleep_timer,NULL);

@@ -83,10 +83,11 @@ cache_t create_cache (uint64_t maxmem, hash_func hash)
   cache->sock = nn_socket (AF_SP, NN_PAIR); 
   assert (cache->sock >= 0 && "Client create socked failed");
   assert (nn_connect (cache->sock, server_addr) >= 0 && "Client connect failed");
-
+  printf("Client socket created\n");
   if (maxmem > 0) {
   sprintf(cache->buffer, "POST /memsize/%lu",maxmem);
   cache_send(cache,cache->buffer);
+  printf("Sent\n");
   }
   return cache;
 }
