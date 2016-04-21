@@ -178,7 +178,7 @@ uint64_t send_count = 0;
       while (cache_recv(test_cache)) recv_count ++;
       clock_gettime(CLOCK_MONOTONIC, &end);
       current_time = end.tv_sec - start.tv_sec;
-      printf("work: current time is %f\n", current_time);
+      printf("work: current time is %f\r", current_time);
     }
   recv_count -= 2;
   FILE *fileout = fopen(outputFilename, "a");
