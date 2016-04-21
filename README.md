@@ -61,6 +61,19 @@ We used the following distribution for size of set values:
 The workload simulator was run for 30 seconds during which it sent requests according to the workload distribution. Requests were sent with a uniform temporal distribution. The only independent parameter was average time between requests (measured in microseconds). The discrepancy between messages sent and received was recorded as a measure of throughput, but in practice the client simply froze when the throughput dropped.
 The simulator was run five times per request-delay. If no freezes occurred, the delay was decreased. The lowest mesage delay without any freezes was used to calculate the maximum throughput.
 
+<h1>Results</h1>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg .tg-yw4l{vertical-align:top}
+</style>
+<table class="tg">
+  <tr>
+    <th class="tg-yw4l"></th>
+  </tr>
+</table>
+
+
 <h1>Analysis</h1>
 
-<h1>Results</h1>
