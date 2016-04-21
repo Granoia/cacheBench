@@ -27,6 +27,7 @@ Due to the limitations of the slab allocator, we consider it correct behavior if
 <h1>Factors</h1>
 
 <h1>Evaluation Technique</h1>
+A prototype server has been implemented, but some specificities of the implementation make direct measurement difficult. A modified server was designed to process requests in the same way as the prototype, but handle networking via a different protocol. Specifically, the modified server uses the one-to-one "PAIR" protocol, and handles requests and replies without blocking. The working server uses the many-to-one "REQ-REP" protocol, which necessitates blocking. The performance difference should only be on the client side, because the server replies immediately to requests in any case; however performance differences between the protocols are not known.
 
 <h1>Workload</h1>
 The Memcache ETC workload:
@@ -41,6 +42,8 @@ We used the following distribution for size of set values:
 
 
 <h1>Experiment</h1>
+The workload simulator was run for 30 seconds during which it sent requests according to the workload distribution. Requests were sent with a uniform temporal distribution. The only independent parameter was average time between requests (measured in microseconds). The discrepancy between messages sent and received was recorded as a measure of throughput, but in practice the client simply froze when the throughput dropped.
+The simulator was run five times per request-delay. If no freezes occurred, the delay was decreased. The lowest mesage delay without any freezes was used to calculate the maximum throughput.
 
 <h1>Analysis</h1>
 
