@@ -6,7 +6,7 @@
 #include <assert.h>
 #include "cache.h"
 #define BILLION 1000000000
-#define outputFilename "out.txt"
+#define outputFilename "workload_data.csv"
 
 
 uint32_t set_count;
@@ -165,6 +165,7 @@ uint64_t send_count = 0;
   //Main loop - send and receive for 30 seconds
   sim_set(test_cache,0,val_ls,key_ls);
   printf("did preliminary set\n");
+  float current_time;
   while (end.tv_sec - start.tv_sec <= 30)
     {
       //Send
@@ -176,10 +177,12 @@ uint64_t send_count = 0;
       //Receive everything in the buffer
       while (cache_recv(test_cache)) recv_count ++;
       clock_gettime(CLOCK_MONOTONIC, &end);
+      current_time = end.tv_sec - start.tv_sec;
+      printf("work: current time is %f\r", current_time);
     }
-
+  recv_count -= 2;
   FILE *fileout = fopen(outputFilename, "a");
-  fprintf(fileout, "%lu, %lu\n",avg_wait_time,send_count - recv_count);
+  fprintf(fileout, "%lu, %" PRIu64"\n",avg_wait_time,send_count - recv_count);
   fclose(fileout);
   printf("Sends: %lu    Recvs: %lu    Discrepancy was %f.\n",send_count,recv_count,(double)recv_count / send_count);
   sleep(5);
