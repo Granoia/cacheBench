@@ -23,8 +23,24 @@ Due to the limitations of the slab allocator, we consider it correct behavior if
 <b>Sustained throughput (rqsts/sec):</b> Maximum load at which mean response time remains under 1 ms
 
 <h1>Parameters</h1>
+Speed of the server CPU--
+Speed of the client CPU--
+Speed of the network--
+Operating system overhead
+Reliability of the network
+
+<h3>Workload Parameters</h3>
+Time between requests
+Size of keys
+Size of values
+Distribution of keys (for hashing)
+Other loads on the CPU  -- should be minimal
+Other loads on the network -- should be minimal
+
 
 <h1>Factors</h1>
+The only factor to be varied is the rate of requests from the client. 
+
 
 <h1>Evaluation Technique</h1>
 A prototype server has been implemented, but some specificities of the implementation make direct measurement difficult. A modified server was designed to process requests in the same way as the prototype, but handle networking via a different protocol. Specifically, the modified server uses the one-to-one "PAIR" protocol, and handles requests and replies without blocking. The working server uses the many-to-one "REQ-REP" protocol, which necessitates blocking. The performance difference should only be on the client side, because the server replies immediately to requests in any case; however performance differences between the protocols are not known.
