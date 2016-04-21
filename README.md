@@ -68,9 +68,54 @@ The simulator was run five times per request-delay. If no freezes occurred, the 
 .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
 .tg .tg-yw4l{vertical-align:top}
 </style>
-<table class="tg">
+<table class="tg" style="undefined;table-layout: fixed; width: 352px">
+<colgroup>
+<col style="width: 192px">
+<col style="width: 160px">
+</colgroup>
   <tr>
-    <th class="tg-yw4l"></th>
+    <th class="tg-yw4l">Average Request Frequency (requests/sec)</th>
+    <th class="tg-yw4l">Jammed?</th>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">2000</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">4000</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">4444</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">5000</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">5714</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">6666</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">8000</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">8695</td>
+    <td class="tg-yw4l">no</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">9090</td>
+    <td class="tg-yw4l">yes</td>
+  </tr>
+  <tr>
+    <td class="tg-yw4l">10000</td>
+    <td class="tg-yw4l">yes</td>
   </tr>
 </table>
 
