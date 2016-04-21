@@ -62,12 +62,7 @@ The workload simulator was run for 30 seconds during which it sent requests acco
 The simulator was run five times per request-delay. If no freezes occurred, the delay was decreased. The lowest mesage delay without any freezes was used to calculate the maximum throughput.
 
 <h1>Results</h1>
-<style type="text/css">
-.tg  {border-collapse:collapse;border-spacing:0;}
-.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-.tg .tg-yw4l{vertical-align:top}
-</style>
+
 <table class="tg" style="undefined;table-layout: fixed; width: 352px">
 <colgroup>
 <col style="width: 192px">
