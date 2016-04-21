@@ -15,6 +15,7 @@ typedef const void *val_type;
 // For a given key string, return a pseudo-random integer:
 typedef uint64_t (*hash_func)(key_type key);
 
+typedef void (*rpmt_func)(cache_t cache);
 
 // Create a new cache object with a given maximum memory capacity.
 cache_t create_cache(uint64_t maxmem, hash_func hasher);
@@ -28,12 +29,14 @@ uint8_t cache_set(cache_t cache, key_type key, val_type val, uint32_t val_size);
 // Retrieve the value associated with key in the cache, or NULL if not found
 val_type cache_get(cache_t cache, key_type key, uint32_t *val_size);
 
+// Delete an object from the cache, if it's still there
+uint8_t cache_delete(cache_t cache, key_type key);
+
+// Compute the total amount of memory used up by all cache values (not keys)
+uint64_t cache_space_used(cache_t cache);
 
 // Destroy all resource connected to a cache object
 uint8_t destroy_cache(cache_t cache);
 
 //For the cache server
 char *server_addr;
-
-//Receive a message; return 1 if anything was received
-int cache_recv(cache_t cache);

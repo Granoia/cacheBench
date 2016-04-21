@@ -1,0 +1,2 @@
+server: tools/list.c tools/tools.c cache.c tools/slabs.c server.c
+	gcc -o srvr -I. -I./tools tools/tools.c cache.c tools/list.c tools/slabs.c server.c nanomsg/.libs/libnanomsg.a jsmn/libjsmn.a -lanl -pthread
