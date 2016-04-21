@@ -116,4 +116,4 @@ The simulator was run five times per request-delay. If no freezes occurred, the 
 
 
 <h1>Analysis</h1>
-
+Judging from the data, it looks like our cache can handle a throughput of up to 8695 requests/second reliably. 
